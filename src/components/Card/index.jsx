@@ -1,5 +1,4 @@
 import PropTypes from 'prop-types'
-import DefaultPicture from '../../assets/profile.png'
 import styled from 'styled-components'
 import colors from '../../utils/style/colors'
 import { useSelector } from 'react-redux'
@@ -57,42 +56,4 @@ Card.propTypes = {
   picture: PropTypes.string.isRequired,
 }
 
-Card.defaultProps = {
-  label: '',
-  title: '',
-  picture: DefaultPicture,
-}
-
 export default Card
-
-// class Card extends Component {
-//   constructor(props) {
-//     super(props)
-//     this.state = { isFavProfile: false }
-//   }
-
-//   updateFavProfile(isFavProfile) {
-//     this.setState({ isFavProfile: !isFavProfile })
-//   }
-
-//   render() {
-//     const { label, title, picture } = this.props
-
-//     return (
-//       <CardWrapper
-//         // isDarkMode={useTheme() === 'dark'}
-//         onClick={() => this.updateFavProfile(this.state.isFavProfile)}
-//       >
-//         <CardLabel
-//         // isDarkMode={useTheme() === 'dark'}
-//         >
-//           {label}
-//         </CardLabel>
-//         <CardImage src={picture} alt="freelance" />
-//         <CardTitle>
-//           {this.state.isFavProfile ? `⭐️${title}⭐️` : title}
-//         </CardTitle>
-//       </CardWrapper>
-//     )
-//   }
-// }

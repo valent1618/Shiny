@@ -1,14 +1,10 @@
-import { useEffect } from 'react'
 import styled from 'styled-components'
 import { useParams } from 'react-router-dom'
 import colors from '../../utils/style/colors'
 import { Loader } from '../../utils/style/Atom'
 import { useSelector } from 'react-redux'
 import { darkMode } from '../../utils/selectors'
-import { dataProfileLoading } from '../../utils/selectors'
-import { selectProfile } from '../../utils/selectors'
-import { fetchOrUpdateProfile } from '../../features/profile'
-import { useStore } from 'react-redux'
+import { useQuery } from 'react-query'
 
 const ProfileContainer = styled.div`
   display: flex;
@@ -102,18 +98,20 @@ const Availability = styled.span`
 function Profile() {
   const isDarkMode = useSelector(darkMode)
   const { id: queryId } = useParams()
-  const store = useStore()
 
-  useEffect(() => {
-    fetchOrUpdateProfile(store, queryId)
-  }, [store, queryId])
-
-  const isLoading = useSelector(dataProfileLoading)
-  const error = useSelector(selectProfile).error
-  const profileData = useSelector(selectProfile).data
+  const { isLoading, error, data } = useQuery(
+    `Profile-${queryId}`,
+    async () => {
+      const response = await fetch(
+        `http://localhost:8000/freelance/?id=${queryId}`
+      )
+      const data = await response.json()
+      return data.freelanceData
+    }
+  )
 
   const { picture, name, location, tjm, job, skills, available, id } =
-    profileData !== null && profileData
+    data !== undefined && data
 
   return (
     <ProfileContainer isDarkMode={isDarkMode}>

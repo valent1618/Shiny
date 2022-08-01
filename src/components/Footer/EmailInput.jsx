@@ -60,37 +60,3 @@ function EmailInput() {
 }
 
 export default EmailInput
-
-// class EmailInput extends Component {
-//   constructor(props) {
-//     super(props)
-//     this.state = { textBeforeInput: 'Abonnez-vous à notre newsletter !' }
-//   }
-
-//   updateTextBeforeInput = (value) => {
-//     this.setState({
-//       textBeforeInput: `${value} enregistré sur notre newsletter !`,
-//     })
-//   }
-
-//   render() {
-//     return (
-//       <InputContainer>
-//         {this.state.textBeforeInput}
-//         <InputButtonContainer>
-//           <Input id="input" />
-//           <SendButton
-//             onClick={() => {
-//               document.getElementById('input').value &&
-//                 this.updateTextBeforeInput(
-//                   document.getElementById('input').value
-//                 )
-//             }}
-//           >
-//             Envoyer
-//           </SendButton>
-//         </InputButtonContainer>
-//       </InputContainer>
-//     )
-//   }
-// }

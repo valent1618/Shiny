@@ -1,19 +1,61 @@
-import { createAction, createReducer } from '@reduxjs/toolkit'
-import { selectSurvey } from '../utils/selectors'
-import { answers } from '../utils/selectors'
+import { createSlice } from '@reduxjs/toolkit'
+import { selectSurvey, answers } from '../utils/selectors'
 
-const initialState = {
-  answers: {},
-  data: [],
-  skills: [],
-  status: 'void',
-  error: null,
-}
+const { actions, reducer } = createSlice({
+  name: 'survey',
+  initialState: {
+    answers: {},
+    data: [],
+    skills: [],
+    status: 'void',
+    error: null,
+  },
+  reducers: {
+    saveAnswer: (state, action) => {
+      state.answers = { ...state.answers, ...action.payload }
+      return
+    },
+    fetching: (state) => {
+      switch (state.status) {
+        case 'void':
+          state.status = 'pending'
+          return
+        case 'rejected':
+          state.error = null
+          state.status = 'pending'
+          return
+        case 'resolved':
+          state.status = 'updating'
+          return
+        default:
+          return
+      }
+    },
+    resolved: (state, action) => {
+      if (state.status === 'pending' || state.status === 'updating') {
+        state.data = action.payload
+        state.skills = []
+        state.data.map((skill) => state.skills.push(skill.title.toUpperCase()))
+        state.status = 'resolved'
+        return
+      }
+      return
+    },
+    rejected: (state, action) => {
+      if (state.status === 'pending' || state.status === 'updating') {
+        state.error = action.payload
+        state.data = []
+        state.skills = []
+        state.status = 'rejected'
+        return
+      }
+      return
+    },
+  },
+})
 
-export const saveAnswer = createAction('survey/saveAnswer')
-export const surveyFetching = createAction('survey/fetching')
-export const surveyResolved = createAction('survey/resolved')
-export const surveyRejected = createAction('survey/rejected')
+export const { saveAnswer, fetching, resolved, rejected } = actions
+export default reducer
 
 function FormatFetchSurvey(store) {
   const answersResult = answers(store.getState())
@@ -31,57 +73,13 @@ export async function fetchSurveyData(store) {
   if (status === 'pending' || status === 'updating') {
     return
   }
-  store.dispatch(surveyFetching())
+  store.dispatch(fetching())
   try {
     const url = FormatFetchSurvey(store)
     const response = await fetch(`http://localhost:8000/results/?${url}`)
     const data = await response.json()
-    store.dispatch(surveyResolved(data.resultsData))
+    store.dispatch(resolved(data.resultsData))
   } catch (error) {
-    store.dispatch(surveyRejected(error))
+    store.dispatch(rejected(error))
   }
 }
-
-export default createReducer(initialState, (builder) =>
-  builder
-    .addCase(saveAnswer, (draft, action) => {
-      draft.answers = { ...draft.answers, ...action.payload }
-      return
-    })
-    .addCase(surveyFetching, (draft, action) => {
-      if (draft.status === 'void') {
-        draft.status = 'pending'
-        return
-      }
-      if (draft.status === 'rejected') {
-        draft.error = null
-        draft.status = 'pending'
-        return
-      }
-      if (draft.status === 'resolved') {
-        draft.status = 'updating'
-        return
-      }
-      return
-    })
-    .addCase(surveyResolved, (draft, action) => {
-      if (draft.status === 'pending' || draft.status === 'updating') {
-        draft.data = action.payload
-        draft.skills = []
-        draft.data.map((skill) => draft.skills.push(skill.title.toUpperCase()))
-        draft.status = 'resolved'
-        return
-      }
-      return
-    })
-    .addCase(surveyRejected, (draft, action) => {
-      if (draft.status === 'pending' || draft.status === 'updating') {
-        draft.error = action.payload
-        draft.data = []
-        draft.skills = []
-        draft.status = 'rejected'
-        return
-      }
-      return
-    })
-)

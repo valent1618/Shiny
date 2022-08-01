@@ -2,17 +2,12 @@ import styled from 'styled-components'
 import colors from '../../utils/style/colors'
 import Card from '../../components/Card'
 import { Loader } from '../../utils/style/Atom'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import {
-  darkMode,
-  dataFreelancesLoading,
-  selectFreelances,
-  selectSurvey,
-} from '../../utils/selectors'
-import { useStore } from 'react-redux'
-import { fetchOrUpdateFreelances } from '../../features/freelances'
+import { darkMode, selectSurvey } from '../../utils/selectors'
+import { useQuery } from 'react-query'
+import FormatJob from '../../utils/format/formatJob'
 
 const SectionProfiles = styled.section`
   display: flex;
@@ -64,16 +59,16 @@ const StyledLink = styled(Link)`
 
 function Freelances() {
   const isDarkMode = useSelector(darkMode)
-  const store = useStore()
   const skills = useSelector(selectSurvey).skills
 
-  useEffect(() => {
-    fetchOrUpdateFreelances(store)
-  }, [store])
-
-  const isLoading = useSelector(dataFreelancesLoading)
-  const freelancersList = useSelector(selectFreelances).data
-  const error = useSelector(selectFreelances).error
+  const { isLoading, error, data } = useQuery('Freelances', async () => {
+    const response = await fetch('http://localhost:8000/freelances')
+    const data = await response.json()
+    data.freelancersList.map(
+      (profile) => (profile.category = FormatJob(profile.job))
+    )
+    return data.freelancersList
+  })
 
   //categories
   const [categories, setCategories] = useState([])
@@ -96,8 +91,7 @@ function Freelances() {
     }
   }
 
-  freelancersList !== null &&
-    freelancersList.map((profile) => AddCategory(profile.category))
+  data !== undefined && data.map((profile) => AddCategory(profile.category))
 
   function SelectCategory(category) {
     const filterCategories = [
@@ -140,7 +134,7 @@ function Freelances() {
             ))}
           </CategoriesContainer>
           <CardsContainer>
-            {freelancersList.map(
+            {data.map(
               (profile, index) =>
                 categories.find(
                   (cat) =>

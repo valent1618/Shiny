@@ -1,18 +1,17 @@
-// import { ThemeProvider } from './utils/context'
-// import { SurveyProvider } from './utils/context'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { QueryClientProvider, QueryClient } from 'react-query'
+import { Provider } from 'react-redux'
+import store from './utils/store'
+import GlobalStyle from './utils/style/GlobalStyle'
+
 import Header from './components/Header'
 import Footer from './components/Footer'
-import Error from './components/Error'
 import Home from './pages/Home'
 import Survey from './pages/Survey'
 import Results from './pages/Results'
 import Freelances from './pages/Freelances'
 import Profile from './pages/Profile'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import GlobalStyle from './utils/style/GlobalStyle'
-import store from './utils/store'
-import { Provider } from 'react-redux'
-import { QueryClientProvider, QueryClient } from 'react-query'
+import Error from './components/Error'
 
 const queryClient = new QueryClient()
 
@@ -21,8 +20,6 @@ function MainRouter() {
     <Router>
       <QueryClientProvider client={queryClient}>
         <Provider store={store}>
-          {/* <ThemeProvider> */}
-          {/* <SurveyProvider> */}
           <GlobalStyle />
           <Header />
           <Routes>
@@ -34,8 +31,6 @@ function MainRouter() {
             <Route path="*" element={<Error />} />
           </Routes>
           <Footer />
-          {/* </SurveyProvider> */}
-          {/* </ThemeProvider> */}
         </Provider>
       </QueryClientProvider>
     </Router>

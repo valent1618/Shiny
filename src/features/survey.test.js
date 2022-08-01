@@ -1,19 +1,19 @@
-import { surveyFetching, surveyResolved, surveyRejected } from './survey'
+import { fetching, resolved, rejected } from './survey'
 import surveyReducer from './survey'
 
 describe('Survey actions', () => {
   it('Should create a fetching action objet', () => {
-    expect(surveyFetching()).toEqual({
+    expect(fetching()).toEqual({
       type: 'survey/fetching',
     })
   })
   it('Should create a resolved action objet', () => {
-    expect(surveyResolved()).toEqual({
+    expect(resolved()).toEqual({
       type: 'survey/resolved',
     })
   })
   it('Should create a rejected action objet', () => {
-    expect(surveyRejected()).toEqual({
+    expect(rejected()).toEqual({
       type: 'survey/rejected',
     })
   })
@@ -30,14 +30,14 @@ describe('Survey reducer', () => {
     })
   })
   it('Should change the status', () => {
-    expect(surveyReducer({ status: 'void' }, surveyFetching())).toEqual({
+    expect(surveyReducer({ status: 'void' }, fetching())).toEqual({
       status: 'pending',
     })
-    expect(surveyReducer({ status: 'rejected' }, surveyFetching())).toEqual({
+    expect(surveyReducer({ status: 'rejected' }, fetching())).toEqual({
       error: null,
       status: 'pending',
     })
-    expect(surveyReducer({ status: 'resolved' }, surveyFetching())).toEqual({
+    expect(surveyReducer({ status: 'resolved' }, fetching())).toEqual({
       status: 'updating',
     })
   })
@@ -45,7 +45,7 @@ describe('Survey reducer', () => {
     expect(
       surveyReducer(
         { status: 'pending' },
-        surveyResolved([{ name: 'Harry Potter', title: 'Sorcier' }])
+        resolved([{ name: 'Harry Potter', title: 'Sorcier' }])
       )
     ).toEqual({
       data: [{ name: 'Harry Potter', title: 'Sorcier' }],
@@ -55,7 +55,7 @@ describe('Survey reducer', () => {
     expect(
       surveyReducer(
         { status: 'updating' },
-        surveyResolved([
+        resolved([
           { name: 'Harry Potter', title: 'Sorcier' },
           { name: 'Hermione Granger', title: 'Magicienne' },
         ])
@@ -70,9 +70,12 @@ describe('Survey reducer', () => {
     })
   })
   it('Should change status add error and empty data', () => {
-    expect(
-      surveyReducer({ status: 'pending' }, surveyRejected('error'))
-    ).toEqual({ error: 'error', data: [], skills: [], status: 'rejected' })
+    expect(surveyReducer({ status: 'pending' }, rejected('error'))).toEqual({
+      error: 'error',
+      data: [],
+      skills: [],
+      status: 'rejected',
+    })
     expect(
       surveyReducer(
         {
@@ -80,7 +83,7 @@ describe('Survey reducer', () => {
           error: '',
           data: { name: 'Harry Potter', job: 'Sorcier' },
         },
-        surveyRejected('error')
+        rejected('error')
       )
     ).toEqual({ error: 'error', data: [], skills: [], status: 'rejected' })
   })
